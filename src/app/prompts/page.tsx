@@ -1,119 +1,60 @@
-'use client'
+import { createClient } from '@/lib/supabase/server'
+import PromptsManager from './PromptsManager'
 
-import { createClient } from '@/lib/supabase/client'
-import { useState, useEffect } from 'react'
-import { Trash2, UploadCloud, Volume2 } from 'lucide-react'
+export const runtime = 'edge';
 
-export default function PromptsPage() {
-    const supabase = createClient()
-    const [files, setFiles] = useState<any[]>([])
-    const [isUploading, setIsUploading] = useState(false)
-    const [uploadProgress, setUploadProgress] = useState('')
+export default async function PromptsPage() {
+    const supabase = await createClient()
 
-    useEffect(() => {
-        fetchFiles()
-    }, [])
+    // 1. Fetch Drivers (for dynamic voice prompts)
+    const { data: drivers } = await supabase
+        .from('drivers')
+        .select('id, riders(name)')
 
-    async function fetchFiles() {
-        const { data } = await supabase.storage.from('prompts').list()
-        if (data) {
-            setFiles(data.filter(f => f.name !== '.emptyFolderPlaceholder'))
-        }
+    // 2. We need unique times to know what time prompts to record
+    // Assuming times are in default_departure_time, we can just grab unique ones
+    const { data: driverTimes } = await supabase
+        .from('drivers')
+        .select('default_departure_time')
+
+    const uniqueTimes = Array.from(new Set(driverTimes?.map(d => d.default_departure_time.substring(0, 5)) || []))
+
+    // 3. Build Checklist of EXPECTED files
+    const expectedPrompts = [
+        { filename: 'staff-rider-menu.mp3', label: 'Staff Menu Intro ("Press 1 to cancel")' },
+        { filename: 'staff-cancel-confirmed.mp3', label: 'Staff Cancellation Confirmed' },
+        { filename: 'no-active-preset.mp3', label: 'Staff Error: No Preset for Today' },
+
+        { filename: 'no-rides-today.mp3', label: 'Bochur Error: No Rides Available Today' },
+        { filename: 'no-seats.mp3', label: 'Bochur Error: Cars are Full' },
+        { filename: 'rider-menu-intro.mp3', label: 'Bochur Menu Intro ("Available cars...")' },
+        { filename: 'booking-confirmed.mp3', label: 'Bochur Booking Confirmed!' },
+
+        { filename: 'to-travel-with.mp3', label: 'Fragment: "To travel with..."' },
+        { filename: 'leaving-at.mp3', label: 'Fragment: "Leaving at..."' },
+        { filename: 'press.mp3', label: 'Fragment: "Press..."' },
+
+        { filename: 'not-driving.mp3', label: 'Driver Menu Error: Not Scheduled' },
+        { filename: 'you-have.mp3', label: 'Driver Menu: "You have..."' },
+        { filename: 'passengers.mp3', label: 'Driver Menu: "...passengers today"' },
+        { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")' },
+    ]
+
+    // Add numbers 1-9
+    for (let i = 1; i <= 9; i++) {
+        expectedPrompts.push({ filename: `${i}.mp3`, label: `Digit: ${i}` })
     }
 
-    async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        if (!e.target.files || e.target.files.length === 0) return
+    // Add Dynamic Driver Names
+    drivers?.forEach(d => {
+        expectedPrompts.push({ filename: `r-${d.id}.mp3`, label: `Driver Name: ${(d.riders as any)?.name}` })
+    })
 
-        setIsUploading(true)
-        const fileList = Array.from(e.target.files)
+    // Add Dynamic Times
+    uniqueTimes.forEach(t => {
+        const formattedFileName = `time-${t.replace(':', '')}.mp3` // e.g. time-0730.mp3
+        expectedPrompts.push({ filename: formattedFileName, label: `Time: ${t}` })
+    })
 
-        for (const file of fileList) {
-            setUploadProgress(`Uploading ${file.name}...`)
-            // Upload or replace the file in the public 'prompts' bucket
-            await supabase.storage.from('prompts').upload(file.name, file, {
-                cacheControl: '3600',
-                upsert: true
-            })
-        }
-
-        setIsUploading(false)
-        setUploadProgress('')
-        fetchFiles() // Refresh list
-    }
-
-    async function handleDelete(fileName: string) {
-        if (confirm(`Are you sure you want to delete ${fileName}?`)) {
-            await supabase.storage.from('prompts').remove([fileName])
-            fetchFiles()
-        }
-    }
-
-    // Get the public URL for playback
-    const getAudioUrl = (fileName: string) => {
-        return supabase.storage.from('prompts').getPublicUrl(fileName).data.publicUrl
-    }
-
-    return (
-        <div className="p-8 max-w-5xl">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Voice Prompts Management</h1>
-                <p className="text-gray-500 mt-1">Upload your Yiddish MP3 recordings here. They will automatically play on the IVR.</p>
-            </div>
-
-            <div className="mb-8 p-6 bg-white border border-dashed border-gray-300 rounded-xl shadow-sm text-center transition hover:bg-gray-50 relative">
-                <input
-                    type="file"
-                    accept="audio/mp3,audio/mpeg"
-                    multiple
-                    onChange={handleFileUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    disabled={isUploading}
-                />
-                <div className="flex flex-col items-center justify-center space-y-3 pointer-events-none">
-                    <UploadCloud size={40} className="text-blue-500" />
-                    <span className="font-semibold text-lg text-gray-700">
-                        {isUploading ? uploadProgress : 'Click or drag MP3 files here to upload'}
-                    </span>
-                    <span className="text-sm text-gray-400">Make sure to name them exactly as generated (e.g. `rider-menu-intro.mp3`)</span>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-50 border-b">
-                        <tr>
-                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">File Name</th>
-                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Size</th>
-                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-center">Playback</th>
-                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y relative">
-                        {files.map(f => (
-                            <tr key={f.name} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-2">
-                                    <Volume2 size={16} className="text-gray-400" /> {f.name}
-                                </td>
-                                <td className="px-6 py-4 text-gray-500">{(f.metadata?.size / 1024).toFixed(1)} KB</td>
-                                <td className="px-6 py-4 text-center">
-                                    <audio controls className="h-8 w-48 mx-auto" src={getAudioUrl(f.name)} />
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <button onClick={() => handleDelete(f.name)} className="text-red-500 hover:text-red-700 p-2">
-                                        <Trash2 size={18} />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        {files.length === 0 && (
-                            <tr>
-                                <td colSpan={4} className="text-center p-8 text-gray-500">No MP3 files uploaded yet.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-    )
+    return <PromptsManager expectedPrompts={expectedPrompts} />
 }
