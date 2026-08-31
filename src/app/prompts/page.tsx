@@ -50,10 +50,7 @@ export default async function PromptsPage() {
         { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")', script: 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי.' },
     ]
 
-    // Add numbers 1-9
-    for (let i = 1; i <= 9; i++) {
-        expectedPrompts.push({ filename: `${i}.mp3`, label: `Digit: ${i}`, script: `זאג די נומער: ${i}` })
-    }
+    // Numbers have been removed from the checklist - they will use automated male Text-To-Speech
 
     // Add Dynamic Driver Names
     drivers?.forEach(d => {
