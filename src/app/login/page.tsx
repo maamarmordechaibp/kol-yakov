@@ -1,23 +1,35 @@
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+'use client'
 
-
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
+    const router = useRouter()
+    const supabase = createClient()
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    async function handleLogin(formData: FormData) {
-        'use server'
-        const password = formData.get('password')
+    async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        setError('')
+        setLoading(true)
 
-        // We only need a single admin password for the dashboard
-        if (password === 'kol123') {
-            const cookieStore = await cookies()
-            cookieStore.set('ky_admin_auth', 'authenticated', {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 60 * 60 * 24 * 7 // 1 week
-            })
-            redirect('/')
+        const formData = new FormData(e.currentTarget)
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
+
+        const { error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        })
+
+        if (authError) {
+            setError(authError.message)
+            setLoading(false)
+        } else {
+            router.push('/')
+            router.refresh()
         }
     }
 
@@ -30,13 +42,26 @@ export default function LoginPage() {
                         ק
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900">Kol Yakov</h1>
-                    <p className="text-gray-500 text-sm mt-1">Yeshiva Ride Management System</p>
+                    <p className="text-gray-500 text-sm mt-1">Admin Dashboard Login</p>
                 </div>
 
-                <form action={handleLogin} className="space-y-6">
+                <form onSubmit={handleLogin} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Admin Password
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email Address
+                        </label>
+                        <input
+                            name="email"
+                            type="email"
+                            required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition outline-none"
+                            placeholder="admin@example.com"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Password
                         </label>
                         <input
                             name="password"
@@ -47,11 +72,14 @@ export default function LoginPage() {
                         />
                     </div>
 
+                    {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
+
                     <button
                         type="submit"
-                        className="w-full bg-slate-900 text-white font-medium py-3 rounded-xl hover:bg-slate-800 transition shadow-sm"
+                        disabled={loading}
+                        className="w-full bg-slate-900 text-white font-medium py-3 rounded-xl hover:bg-slate-800 transition shadow-sm mt-4 disabled:opacity-50"
                     >
-                        Access Dashboard
+                        {loading ? 'Authenticating...' : 'Secure Login'}
                     </button>
                 </form>
 
