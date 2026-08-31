@@ -35,12 +35,14 @@ export async function POST(req: Request) {
         } as any);
 
         // Look up the user
-        // Make sure we format the number. SignalWire usually sends numbers in E.164 format (e.g. +1845...)
-        const { data: rider } = await supabase
+        // Make sure we match securely regardless of +1 formatting in the DB
+        const last10 = fromNumber.replace(/\D/g, '').slice(-10);
+        const { data: riderExt } = await supabase
             .from('riders')
             .select('id, role')
-            .eq('phone', fromNumber)
-            .single();
+            .ilike('phone', `%${last10}`);
+
+        const rider = riderExt && riderExt.length > 0 ? riderExt[0] : null;
 
         if (!rider) {
             // Unknown caller - go to registration

@@ -15,9 +15,10 @@ export async function POST(req: Request) {
         let riderId = new URL(req.url).searchParams.get('riderId');
 
         if (!riderId) {
-            const { data: rider } = await supabase.from('riders').select('id').eq('phone', fromNumber).single();
-            if (!rider) return generateVoiceXML('<Hangup/>');
-            riderId = rider.id;
+            const last10 = fromNumber.replace(/\D/g, '').slice(-10);
+            const { data: riders } = await supabase.from('riders').select('id').ilike('phone', `%${last10}`);
+            if (!riders || riders.length === 0) return generateVoiceXML('<Hangup/>');
+            riderId = riders[0].id;
         }
 
         const { data: driver } = await supabase.from('drivers').select('id').eq('rider_id', riderId).single();

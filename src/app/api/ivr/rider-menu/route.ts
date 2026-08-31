@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
     try {
+        const formData = await req.formData().catch(() => new URLSearchParams());
+        const fromNumber = formData.get('From')?.toString() || '';
         const supabase = await createClient();
 
         // 1. Find all scheduled rides for today
@@ -13,11 +15,10 @@ export async function POST(req: Request) {
         let riderId = new URL(req.url).searchParams.get('riderId');
 
         if (!riderId) {
-            const formData = await req.formData();
-            const fromNumber = formData.get('From') as string;
-            const { data: rider } = await supabase.from('riders').select('id').eq('phone', fromNumber).single();
-            if (!rider) return generateVoiceXML('<Hangup/>');
-            riderId = rider.id;
+            const last10 = fromNumber.replace(/\D/g, '').slice(-10);
+            const { data: riders } = await supabase.from('riders').select('id').ilike('phone', `%${last10}`);
+            if (!riders || riders.length === 0) return generateVoiceXML('<Hangup/>');
+            riderId = riders[0].id;
         }
 
         const { data: rides } = await supabase
