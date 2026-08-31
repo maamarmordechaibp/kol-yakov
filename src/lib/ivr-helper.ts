@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
 
 /**
@@ -16,24 +14,11 @@ export function generateVoiceXML(content: string) {
 }
 
 /**
- * Returns a <Play> tag if the MP3 exists in the public directory, 
- * otherwise falls back to a <Say> tag with Yiddish (yi) language.
+ * Returns a <Say> tag as a TTS fallback since Cloudflare Edge cannot read the filesystem.
  */
 export function playOrSay(fileName: string, fallbackText: string): string {
-    // We assume prompts are stored in public/prompts/
-    const publicPath = path.join(process.cwd(), 'public', 'prompts', fileName);
-
-    // NOTE: In production (like Vercel), we need the base URL to pass to SignalWire.
-    // We grab it from NEXT_PUBLIC_BASE_URL or just use a placeholder for now since SignalWire can handle relative paths 
-    // IF the webhook was called on the same domain, but absolute is safer.
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-domain.ngrok-free.app';
-
-    if (fs.existsSync(publicPath)) {
-        return `<Play>${baseUrl}/prompts/${fileName}</Play>`;
-    } else {
-        // Fallback to Text-to-Speech
-        return `<Say language="he">${fallbackText}</Say>`;
-        // Note: Twilio/SignalWire TTS support for "yi" (Yiddish) might vary. 
-        // Sometimes "he" (Hebrew) or "de" (German) sounds closer or is better supported if "yi" fails.
-    }
+    // Edge runtime cannot read the local filesystem.
+    // Once you record MP3s, replace this function code with: 
+    // return `<Play>https://kol-yakov.pages.dev/prompts/${fileName}</Play>`
+    return `<Say language="he">${fallbackText}</Say>`;
 }
