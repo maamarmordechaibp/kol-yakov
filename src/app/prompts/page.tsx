@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import PromptsManager from './PromptsManager'
 
-export const runtime = 'edge';
+
 
 export default async function PromptsPage() {
     const supabase = await createClient()

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { generateVoiceXML, playOrSay } from '@/lib/ivr-helper';
 import { createClient } from '@/lib/supabase/server';
 
-export const runtime = 'edge';
+
 
 export async function POST(req: Request) {
     try {

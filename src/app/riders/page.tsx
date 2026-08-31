@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { AddUserForm } from './AddUserForm'
 
-export const runtime = 'edge';
+
 
 export default async function RidersPage() {
     const supabase = await createClient()

@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { RideStatus } from '@/types/database'
 
-export const runtime = 'edge';
+
 
 export default async function Home() {
   const supabase = await createClient()
