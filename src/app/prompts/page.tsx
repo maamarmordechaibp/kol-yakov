@@ -19,6 +19,10 @@ export default async function PromptsPage() {
 
     const uniqueTimes = Array.from(new Set(driverTimes?.map(d => d.default_departure_time.substring(0, 5)) || []))
 
+    // Fetch the bucket files safely on the server side
+    const { data: bucketData } = await supabase.storage.from('prompts').list()
+    const initialBucketFiles = bucketData?.map(f => f.name) || []
+
     // 3. Build Checklist of EXPECTED files
     const expectedPrompts = [
         { filename: 'staff-rider-menu.mp3', label: 'Staff Menu Intro ("Press 1 to cancel")' },
@@ -56,5 +60,5 @@ export default async function PromptsPage() {
         expectedPrompts.push({ filename: formattedFileName, label: `Time: ${t}` })
     })
 
-    return <PromptsManager expectedPrompts={expectedPrompts} />
+    return <PromptsManager expectedPrompts={expectedPrompts} initialBucketFiles={initialBucketFiles} />
 }

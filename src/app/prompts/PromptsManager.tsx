@@ -2,19 +2,15 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect, useRef } from 'react'
-import { CheckCircle2, XCircle, Upload, PlayCircle, Trash2 } from 'lucide-react'
+import { CheckCircle2, XCircle, Upload, PlayCircle, Trash2, RefreshCcw } from 'lucide-react'
 
 type PromptDef = { filename: string, label: string }
 
-export default function PromptsManager({ expectedPrompts }: { expectedPrompts: PromptDef[] }) {
+export default function PromptsManager({ expectedPrompts, initialBucketFiles }: { expectedPrompts: PromptDef[], initialBucketFiles: string[] }) {
     const supabase = createClient()
-    const [bucketFiles, setBucketFiles] = useState<string[]>([])
+    const [bucketFiles, setBucketFiles] = useState<string[]>(initialBucketFiles)
     const [uploadingTarget, setUploadingTarget] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-    useEffect(() => {
-        fetchBucketState()
-    }, [])
 
     async function fetchBucketState() {
         const { data } = await supabase.storage.from('prompts').list()
@@ -58,9 +54,14 @@ export default function PromptsManager({ expectedPrompts }: { expectedPrompts: P
 
     return (
         <div className="p-8 max-w-6xl">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Voice Prompt Checklist</h1>
-                <p className="text-gray-500 mt-1">Upload an MP3 for each required system prompt. The system automatically handles renaming the file for you.</p>
+            <div className="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Voice Prompt Checklist</h1>
+                    <p className="text-gray-500 mt-1">Upload an MP3 for each required system prompt. The system automatically handles renaming the file for you.</p>
+                </div>
+                <button onClick={fetchBucketState} className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium flex gap-2 items-center">
+                    <RefreshCcw size={16} /> Refresh List
+                </button>
             </div>
 
             {/* Hidden file input used for the specific row uploads */}
