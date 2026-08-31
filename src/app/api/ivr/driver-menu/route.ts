@@ -11,21 +11,16 @@ export async function POST(req: Request) {
 
         const supabase = await createClient();
 
-        // 1. Get Driver Info
-        const { data: rider } = await supabase
-            .from('riders')
-            .select('id')
-            .eq('phone', fromNumber)
-            .single();
+        // Allow passing riderId directly for temporary registration sessions
+        let riderId = new URL(req.url).searchParams.get('riderId');
 
-        if (!rider) return generateVoiceXML('<Hangup/>');
+        if (!riderId) {
+            const { data: rider } = await supabase.from('riders').select('id').eq('phone', fromNumber).single();
+            if (!rider) return generateVoiceXML('<Hangup/>');
+            riderId = rider.id;
+        }
 
-        const { data: driver } = await supabase
-            .from('drivers')
-            .select('id')
-            .eq('rider_id', rider.id)
-            .single();
-
+        const { data: driver } = await supabase.from('drivers').select('id').eq('rider_id', riderId).single();
         if (!driver) return generateVoiceXML('<Hangup/>');
 
         // 2. Find today's ride

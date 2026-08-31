@@ -10,6 +10,16 @@ export async function POST(req: Request) {
 
         // 1. Find all scheduled rides for today
         const today = new Date().toISOString().split('T')[0];
+        let riderId = new URL(req.url).searchParams.get('riderId');
+
+        if (!riderId) {
+            const formData = await req.formData();
+            const fromNumber = formData.get('From') as string;
+            const { data: rider } = await supabase.from('riders').select('id').eq('phone', fromNumber).single();
+            if (!rider) return generateVoiceXML('<Hangup/>');
+            riderId = rider.id;
+        }
+
         const { data: rides } = await supabase
             .from('daily_rides')
             .select('id, estimated_departure_time, driver_id, drivers(car_capacity, rider_id)')

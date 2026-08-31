@@ -25,6 +25,11 @@ export default async function PromptsPage() {
 
     // 3. Build Checklist of EXPECTED files
     const expectedPrompts = [
+        { filename: 'enter-home-phone.mp3', label: 'Registration: Enter Home Phone' },
+        { filename: 'confirm-profile.mp3', label: 'Registration: Profile Found, Press 1 to Confirm' },
+        { filename: 'registration-success.mp3', label: 'Registration: Success, cell linked!' },
+        { filename: 'phone-not-found.mp3', label: 'Registration: Error, Phone Not Found' },
+
         { filename: 'staff-rider-menu.mp3', label: 'Staff Menu Intro ("Press 1 to cancel")' },
         { filename: 'staff-cancel-confirmed.mp3', label: 'Staff Cancellation Confirmed' },
         { filename: 'no-active-preset.mp3', label: 'Staff Error: No Preset for Today' },
