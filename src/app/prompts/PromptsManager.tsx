@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect, useRef } from 'react'
 import { CheckCircle2, XCircle, Upload, PlayCircle, Trash2, RefreshCcw } from 'lucide-react'
 
-type PromptDef = { filename: string, label: string }
+type PromptDef = { filename: string, label: string, script?: string }
 
 export default function PromptsManager({ expectedPrompts, initialBucketFiles }: { expectedPrompts: PromptDef[], initialBucketFiles: string[] }) {
     const supabase = createClient()
@@ -102,7 +102,12 @@ export default function PromptsManager({ expectedPrompts, initialBucketFiles }: 
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 font-medium">{prompt.label}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="font-medium">{prompt.label}</div>
+                                        {prompt.script && (
+                                            <div className="text-sm text-slate-500 mt-1" dir="rtl">{prompt.script}</div>
+                                        )}
+                                    </td>
                                     <td className="px-6 py-4 font-mono text-xs text-slate-400 bg-slate-100 rounded px-2 w-max inline-flex mt-3 shadow-none">
                                         {prompt.filename}
                                     </td>

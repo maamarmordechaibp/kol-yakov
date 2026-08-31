@@ -25,44 +25,45 @@ export default async function PromptsPage() {
 
     // 3. Build Checklist of EXPECTED files
     const expectedPrompts = [
-        { filename: 'enter-home-phone.mp3', label: 'Registration: Enter Home Phone' },
-        { filename: 'confirm-profile.mp3', label: 'Registration: Profile Found, Press 1 to Confirm' },
-        { filename: 'registration-success.mp3', label: 'Registration: Success, cell linked!' },
-        { filename: 'phone-not-found.mp3', label: 'Registration: Error, Phone Not Found' },
+        { filename: 'enter-home-phone.mp3', label: 'Registration: Enter Home Phone', script: 'מיר דערקענען נישט אייער נומער. ביטע דרוקט אייער צען ציפערן היים טעלעפאן נומער.' },
+        { filename: 'confirm-profile.mp3', label: 'Registration: Profile Found, Press 1 to Confirm', script: 'צו נוצן די קאלער איי די פערמענאנט דרוקט איינס. צו נוצן די נומער נאר פאר יעצט, דרוקט צוויי.' },
+        { filename: 'registration-success.mp3', label: 'Registration: Success, cell linked!', script: 'אייער סעלפאן נומער איז פערמענאנט באשטעטיגט געווארן.' },
+        { filename: 'temp-session.mp3', label: 'Registration: Temporary session selected', script: 'איר נוצט די סיסטעם נאר פאר יעצט. ווען דער קאר פארט ארויס וועט די קאל אריינקומען צו אייער היים טעלעפאן נומער.' },
+        { filename: 'phone-not-found.mp3', label: 'Registration: Error, Phone Not Found', script: 'מיר האבן נישט געטראפן די נומער אין אונזער סיסטעם.' },
 
-        { filename: 'staff-rider-menu.mp3', label: 'Staff Menu Intro ("Press 1 to cancel")' },
-        { filename: 'staff-cancel-confirmed.mp3', label: 'Staff Cancellation Confirmed' },
-        { filename: 'no-active-preset.mp3', label: 'Staff Error: No Preset for Today' },
+        { filename: 'staff-rider-menu.mp3', label: 'Staff Menu Intro ("Press 1 to cancel")', script: 'דרוקט איינס צו אפזאגן אייער פלאץ פאר היינט.' },
+        { filename: 'staff-cancel-confirmed.mp3', label: 'Staff Cancellation Confirmed', script: 'אייער פלאץ איז סוקסעספול אפגעזאגט געווארן פאר היינט.' },
+        { filename: 'no-active-preset.mp3', label: 'Staff Error: No Preset for Today', script: 'איר האט נישט קיין סיט פאר היינט.' },
 
-        { filename: 'no-rides-today.mp3', label: 'Bochur Error: No Rides Available Today' },
-        { filename: 'no-seats.mp3', label: 'Bochur Error: Cars are Full' },
-        { filename: 'rider-menu-intro.mp3', label: 'Bochur Menu Intro ("Available cars...")' },
-        { filename: 'booking-confirmed.mp3', label: 'Bochur Booking Confirmed!' },
+        { filename: 'no-rides-today.mp3', label: 'Bochur Error: No Rides Available Today', script: 'עס זענען נישטא קיין קארס פאר היינט. א גוטן טאג.' },
+        { filename: 'no-seats.mp3', label: 'Bochur Error: Cars are Full', script: 'אלע קארס זענען ליידער שוין פול פאר היינט. א גוטן טאג.' },
+        { filename: 'rider-menu-intro.mp3', label: 'Bochur Menu Intro ("Available cars...")', script: 'דאס זענען די עוועילעבל קארס פאר היינט:' },
+        { filename: 'booking-confirmed.mp3', label: 'Bochur Booking Confirmed!', script: 'אייער פלאץ דערווייל איז סוקסעספול באשטעטיגט געווארן! מיר וועלן אייך רופן ווען די קאר פארט ארויס.' },
 
-        { filename: 'to-travel-with.mp3', label: 'Fragment: "To travel with..."' },
-        { filename: 'leaving-at.mp3', label: 'Fragment: "Leaving at..."' },
-        { filename: 'press.mp3', label: 'Fragment: "Press..."' },
+        { filename: 'to-travel-with.mp3', label: 'Fragment: "To travel with..."', script: 'צו פארן מיט' },
+        { filename: 'leaving-at.mp3', label: 'Fragment: "Leaving at..."', script: 'וואס פארט ארויס אום' },
+        { filename: 'press.mp3', label: 'Fragment: "Press..."', script: 'דרוקט' },
 
-        { filename: 'not-driving.mp3', label: 'Driver Menu Error: Not Scheduled' },
-        { filename: 'you-have.mp3', label: 'Driver Menu: "You have..."' },
-        { filename: 'passengers.mp3', label: 'Driver Menu: "...passengers today"' },
-        { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")' },
+        { filename: 'not-driving.mp3', label: 'Driver Menu Error: Not Scheduled', script: 'איר זענט נישט מיועד צו דרייוון היינט.' },
+        { filename: 'you-have.mp3', label: 'Driver Menu: "You have..."', script: 'איר האט יעצט' },
+        { filename: 'passengers.mp3', label: 'Driver Menu: "...passengers today"', script: 'פאסאזשירן פאר היינט.' },
+        { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")', script: 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי.' },
     ]
 
     // Add numbers 1-9
     for (let i = 1; i <= 9; i++) {
-        expectedPrompts.push({ filename: `${i}.mp3`, label: `Digit: ${i}` })
+        expectedPrompts.push({ filename: `${i}.mp3`, label: `Digit: ${i}`, script: `זאג די נומער: ${i}` })
     }
 
     // Add Dynamic Driver Names
     drivers?.forEach(d => {
-        expectedPrompts.push({ filename: `r-${d.id}.mp3`, label: `Driver Name: ${(d.riders as any)?.name}` })
+        expectedPrompts.push({ filename: `r-${d.id}.mp3`, label: `Driver Name: ${(d.riders as any)?.name}`, script: `ליגט דער נאמען פון דעם דרייווער: ${(d.riders as any)?.name}` })
     })
 
     // Add Dynamic Times
     uniqueTimes.forEach(t => {
         const formattedFileName = `time-${t.replace(':', '')}.mp3` // e.g. time-0730.mp3
-        expectedPrompts.push({ filename: formattedFileName, label: `Time: ${t}` })
+        expectedPrompts.push({ filename: formattedFileName, label: `Time: ${t}`, script: `די צייט איז ${t}` })
     })
 
     return <PromptsManager expectedPrompts={expectedPrompts} initialBucketFiles={initialBucketFiles} />
