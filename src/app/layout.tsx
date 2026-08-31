@@ -2,7 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Link from 'next/link'
-import { Car, PhoneCall, Users, Calendar, Settings } from 'lucide-react'
+import { Car, PhoneCall, Users, Calendar, Settings, Volume2 } from 'lucide-react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -38,6 +38,9 @@ export default function RootLayout({
               </Link>
               <Link href="/calls" className="flex items-center gap-3 px-3 py-2 rounded transition hover:bg-slate-800">
                 <PhoneCall size={18} /> Call Logs
+              </Link>
+              <Link href="/prompts" className="flex items-center gap-3 px-3 py-2 rounded transition hover:bg-slate-800">
+                <Volume2 size={18} /> Voice Prompts
               </Link>
             </nav>
           </div>
