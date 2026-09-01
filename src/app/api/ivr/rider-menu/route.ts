@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
         if (!rides || rides.length === 0) {
             return generateVoiceXML(`
-        ${playOrSay('no-rides-today.mp3', 'עס זענען נישטא קיין קארס פאר היינט. א גוטן טאג.')}
+        ${playOrSay('no-rides-today.wav', 'עס זענען נישטא קיין קארס פאר היינט. א גוטן טאג.')}
         <Hangup/>
       `);
         }
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
 
         if (availableRides.length === 0) {
             return generateVoiceXML(`
-        ${playOrSay('no-seats.mp3', 'אלע קארס זענען ליידער שוין פול פאר היינט. א גוטן טאג.')}
+        ${playOrSay('no-seats.wav', 'אלע קארס זענען ליידער שוין פול פאר היינט. א גוטן טאג.')}
         <Hangup/>
       `);
         }
@@ -65,18 +65,18 @@ export async function POST(req: Request) {
         let gatherXml = `<Gather action="/api/ivr/rider-menu/process?rides=${rideIds}" method="POST" numDigits="1" timeout="7">`;
 
         // Play intro: "Here are the available rides. Press 1 for..."
-        gatherXml += playOrSay('rider-menu-intro.mp3', 'דאס זענען די עוועילעבל קארס פאר היינט:');
+        gatherXml += playOrSay('rider-menu-intro.wav', 'דאס זענען די עוועילעבל קארס פאר היינט:');
 
         availableRides.forEach((ride, index) => {
             // Announce the driver and standard number pressing
             const pressNumber = index + 1; // 1, 2, 3...
             gatherXml += `
-        ${playOrSay('to-travel-with.mp3', 'צו פארן מיט')}
-        ${playOrSay(`r-${ride.driver_id}.mp3`, 'דעם דרייווער')}
-        ${playOrSay('leaving-at.mp3', 'וואס פארט ארויס אום')}
-        ${playOrSay(`time-${ride.estimated_departure_time.replace(/:/g, '')}.mp3`, 'די צייט')}
-        ${playOrSay('press.mp3', 'דרוקט')}
-        ${playOrSay(`${pressNumber}.mp3`, String(pressNumber))}
+        ${playOrSay('to-travel-with.wav', 'צו פארן מיט')}
+        ${playOrSay(`r-${ride.driver_id}.wav`, 'דעם דרייווער')}
+        ${playOrSay('leaving-at.wav', 'וואס פארט ארויס אום')}
+        ${playOrSay(`time-${ride.estimated_departure_time.replace(/:/g, '')}.wav`, 'די צייט')}
+        ${playOrSay('press.wav', 'דרוקט')}
+        ${playOrSay(`${pressNumber}.wav`, String(pressNumber))}
       `;
         });
 
@@ -89,3 +89,4 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Say>Error.</Say><Hangup/>');
     }
 }
+

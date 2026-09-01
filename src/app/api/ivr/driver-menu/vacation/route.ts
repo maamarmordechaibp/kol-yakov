@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
         const xml = `
           <Gather action="/api/ivr/driver-menu/vacation/process?driverId=${driverId}" method="POST" numDigits="2" timeout="10">
-             ${playOrSay('vacation-how-many-days.mp3', 'פאר וויפיל טעג דארפט איר וואקאציע? ביטע דרוקט די נומער פון טעג, נאכגעפאלגט מיטן פאונד קנעפל.')}
+             ${playOrSay('vacation-how-many-days.wav', 'פאר וויפיל טעג דארפט איר וואקאציע? ביטע דרוקט די נומער פון טעג, נאכגעפאלגט מיטן פאונד קנעפל.')}
           </Gather>
           <Hangup/>
         `;
@@ -19,3 +19,4 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Hangup/>');
     }
 }
+

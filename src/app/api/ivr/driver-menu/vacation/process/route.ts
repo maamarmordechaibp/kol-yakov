@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         }
 
         const xml = `
-           ${playOrSay('vacation-success.mp3', 'א דאנק. די סיסטעם האט סוקסעספול פארשריבן אייער וואקאציע. א גוטן טאג.')}
+           ${playOrSay('vacation-success.wav', 'א דאנק. די סיסטעם האט סוקסעספול פארשריבן אייער וואקאציע. א גוטן טאג.')}
            <Hangup/>
         `;
         return generateVoiceXML(xml);
@@ -47,3 +47,4 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Hangup/>');
     }
 }
+
