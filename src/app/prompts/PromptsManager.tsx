@@ -10,7 +10,9 @@ export default function PromptsManager({ expectedPrompts, initialBucketFiles }: 
     const supabase = createClient()
     const [bucketFiles, setBucketFiles] = useState<string[]>(initialBucketFiles)
     const [uploadingTarget, setUploadingTarget] = useState<string | null>(null)
+    const [isBulkUploading, setIsBulkUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const bulkInputRef = useRef<HTMLInputElement>(null)
 
     async function fetchBucketState() {
         const { data } = await supabase.storage.from('prompts').list()
@@ -47,6 +49,32 @@ export default function PromptsManager({ expectedPrompts, initialBucketFiles }: 
         }
     }
 
+    async function handleBulkUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files || e.target.files.length === 0) return
+        setIsBulkUploading(true)
+
+        const files = Array.from(e.target.files)
+        for (const file of files) {
+            let finalName = file.name;
+            // Clean accidental double extensions if they occurred during terminal processing
+            if (finalName.endsWith('.mp3.mp3')) finalName = finalName.replace('.mp3.mp3', '.mp3');
+            if (finalName.endsWith('.wav.mp3')) finalName = finalName.replace('.wav.mp3', '.mp3');
+
+            // Find if this file belongs to the dashboard slots
+            const match = expectedPrompts.find(p => p.filename === finalName)
+            if (match) {
+                await supabase.storage.from('prompts').upload(finalName, file, {
+                    cacheControl: '0',
+                    upsert: true
+                })
+            }
+        }
+
+        setIsBulkUploading(false)
+        if (bulkInputRef.current) bulkInputRef.current.value = '';
+        fetchBucketState()
+    }
+
     const getAudioUrl = (filename: string) => {
         // Adding a timestamp query bypasses the browser cache so you hear the latest upload immediately!
         return supabase.storage.from('prompts').getPublicUrl(filename).data.publicUrl + '?t=' + Date.now()
@@ -59,9 +87,15 @@ export default function PromptsManager({ expectedPrompts, initialBucketFiles }: 
                     <h1 className="text-3xl font-bold text-gray-900">Voice Prompt Checklist</h1>
                     <p className="text-gray-500 mt-1">Upload an MP3 for each required system prompt. The system automatically handles renaming the file for you.</p>
                 </div>
-                <button onClick={fetchBucketState} className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium flex gap-2 items-center">
-                    <RefreshCcw size={16} /> Refresh List
-                </button>
+                <div className="flex gap-3">
+                    <input type="file" multiple accept="audio/*" ref={bulkInputRef} className="hidden" onChange={handleBulkUpload} />
+                    <button onClick={() => bulkInputRef.current?.click()} disabled={isBulkUploading} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex gap-2 items-center">
+                        <Upload size={16} /> {isBulkUploading ? 'Uploading Folder...' : 'Bulk Upload Folder'}
+                    </button>
+                    <button onClick={fetchBucketState} className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium flex gap-2 items-center">
+                        <RefreshCcw size={16} /> Refresh List
+                    </button>
+                </div>
             </div>
 
             {/* Hidden file input used for the specific row uploads */}
