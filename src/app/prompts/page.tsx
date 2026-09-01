@@ -47,7 +47,13 @@ export default async function PromptsPage() {
         { filename: 'not-driving.mp3', label: 'Driver Menu Error: Not Scheduled', script: 'איר זענט נישט מיועד צו דרייוון היינט.' },
         { filename: 'you-have.mp3', label: 'Driver Menu: "You have..."', script: 'איר האט יעצט' },
         { filename: 'passengers.mp3', label: 'Driver Menu: "...passengers today"', script: 'פאסאזשירן פאר היינט.' },
-        { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")', script: 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי.' },
+        { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")', script: 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי. צו נעמען וואקאציע פאר אפאר טעג דרוקט דריי.' },
+
+        { filename: 'vacation-prompt-intro.mp3', label: 'Driver Menu: Press 3 for Vacation Intro', script: 'צו רעפארטן אז איר פארט אוועק אויף וואקאציע, דרוקט דריי.' },
+        { filename: 'vacation-how-many-days.mp3', label: 'Vacation Menu: How many days?', script: 'פאר וויפיל טעג דארפט איר וואקאציע? ביטע דרוקט די נומער פון טעג, נאכגעפאלגט מיטן פאונד קנעפל.' },
+        { filename: 'vacation-success.mp3', label: 'Vacation Menu: Success!', script: 'א דאנק. די סיסטעם האט סוקסעספול פארשריבן אייער וואקאציע. א גוטן טאג.' },
+        { filename: 'driver-departed-success.mp3', label: 'Driver action: Departed!', script: 'א גרויסן יישר כח, אלע פאסאזשירן באקומען יעצט א קאל צו אראפקומען.' },
+        { filename: 'driver-cancel-success.mp3', label: 'Driver action: Cancelled Run!', script: 'דער קאר איז סוקסעספול אפגעזאגט געווארן. אלע פאסאזשירן וועלן אריבערגיין צום נעקסטן קאר.' },
     ]
 
     // Numbers have been removed from the checklist - they will use automated male Text-To-Speech
