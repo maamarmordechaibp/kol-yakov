@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
         const { data: rides } = await supabase
             .from('daily_rides')
-            .select('id, estimated_departure_time, driver_id, drivers(car_capacity, rider_id, audio_type, tts_name)')
+            .select('id, estimated_departure_time, delay_minutes, driver_id, drivers(car_capacity, rider_id, audio_type, tts_name)')
             .eq('ride_date', today)
             .eq('status', 'scheduled');
 
@@ -64,6 +64,10 @@ export async function POST(req: Request) {
         const rideIds = availableRides.map(r => r.id).join(',');
         let gatherXml = `<Gather action="/api/ivr/rider-menu/process?rides=${rideIds}" method="POST" numDigits="1" timeout="7">`;
 
+        // Pre-fetch prompts bucket to see which time files actually exist!
+        const { data: promptFiles } = await supabase.storage.from('prompts').list();
+        const existingPrompts = promptFiles ? promptFiles.map(f => f.name) : [];
+
         // Play intro: "Here are the available rides. Press 1 for..."
         gatherXml += playOrSay('rider-menu-intro.mp3', 'דאס זענען די עוועילעבל קארס פאר היינט:');
 
@@ -79,11 +83,32 @@ export async function POST(req: Request) {
                 driverAudioXML = playOrSay(`r-${ride.driver_id}.mp3`, 'דעם דרייווער');
             }
 
+            // Time Math!
+            const totalDelay = ride.delay_minutes || 0;
+            const [hours, minutes] = ride.estimated_departure_time.split(':');
+            let d = new Date();
+            d.setHours(parseInt(hours), parseInt(minutes) + totalDelay, 0, 0);
+
+            const fileHH = d.getHours().toString().padStart(2, '0');
+            const fileMM = d.getMinutes().toString().padStart(2, '0');
+            const targetFileName = `time-${fileHH}${fileMM}.mp3`;
+
+            let timeAudioXML = '';
+            if (existingPrompts.includes(targetFileName)) {
+                timeAudioXML = playOrSay(targetFileName, 'די צייט');
+            } else {
+                const ampm = d.getHours() >= 12 ? 'PM' : 'AM';
+                let hr12 = d.getHours() % 12;
+                if (hr12 === 0) hr12 = 12;
+                // Add a small pause for smooth pronunciation
+                timeAudioXML = `<Say voice="man">${hr12} ${fileMM} ${ampm}</Say>`;
+            }
+
             gatherXml += `
         ${playOrSay('to-travel-with.mp3', 'צו פארן מיט')}
         ${driverAudioXML}
         ${playOrSay('leaving-at.mp3', 'וואס פארט ארויס אום')}
-        ${playOrSay(`time-${ride.estimated_departure_time.replace(/:/g, '')}.mp3`, 'די צייט')}
+        ${timeAudioXML}
         ${playOrSay('press.mp3', 'דרוקט')}
         ${playOrSay(`${pressNumber}.mp3`, String(pressNumber))}
       `;

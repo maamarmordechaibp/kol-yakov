@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-
-
+import StaffPresetManager from './StaffPresetManager'
 
 export default async function SchedulesPage() {
     const supabase = await createClient()
@@ -22,9 +21,13 @@ export default async function SchedulesPage() {
         .select(`
        id,
        day_of_week,
+       direction,
        drivers ( riders(name) ),
        riders ( name )
     `);
+
+    // Fetch staff for dropdown
+    const { data: staff } = await supabase.from('riders').select('id, name').eq('role', 'staff').order('name');
 
     return (
         <div className="p-8 max-w-6xl">
@@ -64,31 +67,7 @@ export default async function SchedulesPage() {
                         Staff members listed here are <b>automatically</b> booked onto these drivers for the days specified, guaranteeing them a seat.
                     </p>
 
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-100 rounded-t-lg">
-                            <tr>
-                                <th className="px-4 py-2 font-semibold text-sm">Staff Member</th>
-                                <th className="px-4 py-2 font-semibold text-sm">Assigned Driver</th>
-                                <th className="px-4 py-2 font-semibold text-sm">Day of Week</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {presets?.map(p => (
-                                <tr key={p.id}>
-                                    <td className="px-4 py-3 font-medium text-indigo-700">{(p.riders as any)?.name}</td>
-                                    <td className="px-4 py-3 text-gray-800">{((p.drivers as any)?.riders as any)?.name}</td>
-                                    <td className="px-4 py-3 text-gray-500">
-                                        {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][p.day_of_week]}
-                                    </td>
-                                </tr>
-                            ))}
-                            {(!presets || presets.length === 0) && (
-                                <tr>
-                                    <td colSpan={3} className="px-4 py-8 text-center text-gray-500">No staff presets assigned across any day.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                    <StaffPresetManager initialPresets={presets || []} staff={staff || []} drivers={drivers || []} />
                 </section>
             </div>
         </div>

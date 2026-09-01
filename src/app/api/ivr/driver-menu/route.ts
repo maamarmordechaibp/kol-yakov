@@ -21,19 +21,26 @@ export async function POST(req: Request) {
             riderId = riders[0].id;
         }
 
-        const { data: driver } = await supabase.from('drivers').select('id').eq('rider_id', riderId).single();
-        if (!driver) return generateVoiceXML('<Hangup/>');
+        const { data: drivers } = await supabase.from('drivers').select('id').eq('rider_id', riderId);
+        if (!drivers || drivers.length === 0) return generateVoiceXML('<Hangup/>');
+        const driverIds = drivers.map(d => d.id);
 
-        // 2. Find today's ride
+        // 3. Find this driver's scheduled ride for today
         const today = new Date().toISOString().split('T')[0];
-        const { data: ride } = await supabase
-            .from('daily_rides')
-            .select('id, status')
-            .eq('driver_id', driver.id)
-            .eq('ride_date', today)
-            .single();
 
-        if (!ride || ride.status === 'cancelled') {
+        // Find ALL active rides for this driver today, sorted chronologically!
+        const { data: rides } = await supabase
+            .from('daily_rides')
+            .select('id, estimated_departure_time')
+            .in('driver_id', driverIds)
+            .eq('ride_date', today)
+            .eq('status', 'scheduled')
+            .order('estimated_departure_time', { ascending: true });
+
+        // Grab the absolute NEXT chronological ride they have to do!
+        const ride = rides && rides.length > 0 ? rides[0] : null;
+
+        if (!ride) {
             return generateVoiceXML(`
            <Gather action="/api/ivr/driver-menu/process?rideId=none&amp;riderId=${riderId}" method="POST" numDigits="1" timeout="7">
                ${playOrSay('not-driving.mp3', 'איר זענט נישט מיועד צו דרייוון היינט.')}
@@ -59,7 +66,7 @@ export async function POST(req: Request) {
       ${playOrSay('passengers.mp3', 'פאסאזשירן פאר היינט')}
       
       <Gather action="/api/ivr/driver-menu/process?rideId=${ride.id}&amp;riderId=${riderId}" method="POST" numDigits="1" timeout="7">
-         ${playOrSay('driver-menu.mp3', 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי. צו נעמען וואקאציע פאר אפאר טעג דרוקט דריי.')}
+         ${playOrSay('driver-menu.mp3', 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי. צו נעמען וואקאציע פאר אפאר טעג דרוקט דריי. צו שפעטיגן אייער ארויספאר צייט, דרוקט פיר.')}
       </Gather>
       <Hangup/>
     `;
