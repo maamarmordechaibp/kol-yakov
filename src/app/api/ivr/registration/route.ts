@@ -8,7 +8,7 @@ export async function POST(req: Request) {
           <Gather action="/api/ivr/registration/process" method="POST" numDigits="10" timeout="10">
              ${playOrSay('enter-home-phone.mp3', 'מיר דערקענען נישט אייער נומער. ביטע דרוקט אייער צען ציפערן היים טעלעפאן נומער.')}
           </Gather>
-          <Redirect method="POST">/api/ivr/registration</Redirect>
+          <Hangup/>
         `;
         return generateVoiceXML(xml);
     } catch (error) {

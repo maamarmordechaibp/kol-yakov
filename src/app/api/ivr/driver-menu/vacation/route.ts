@@ -11,7 +11,7 @@ export async function POST(req: Request) {
           <Gather action="/api/ivr/driver-menu/vacation/process?driverId=${driverId}" method="POST" numDigits="2" timeout="10">
              ${playOrSay('vacation-how-many-days.mp3', 'פאר וויפיל טעג דארפט איר וואקאציע? ביטע דרוקט די נומער פון טעג, נאכגעפאלגט מיטן פאונד קנעפל.')}
           </Gather>
-          <Redirect method="POST">/api/ivr/driver-menu/vacation?driverId=${driverId}</Redirect>
+          <Hangup/>
         `;
         return generateVoiceXML(xml);
     } catch (error) {
