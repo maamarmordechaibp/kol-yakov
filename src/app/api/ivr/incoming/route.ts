@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateVoiceXML, playOrSay } from '@/lib/ivr-helper';
@@ -74,7 +72,6 @@ export async function POST(req: Request) {
 
     } catch (error) {
         console.error('Incoming Webhook Error:', error);
-        // In case of error, play a fallback message 
-        return generateVoiceXML('<Say language="yi">עס איז דא אן ערראר. ביטע פראבירט שפעטער.</Say><Hangup/>');
+        return generateVoiceXML('<Hangup/>');
     }
 }

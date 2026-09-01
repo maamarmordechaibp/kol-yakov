@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { NextResponse } from 'next/server';
 import { generateVoiceXML, playOrSay } from '@/lib/ivr-helper';
 import { createClient } from '@/lib/supabase/server';
