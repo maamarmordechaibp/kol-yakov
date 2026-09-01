@@ -11,8 +11,8 @@ export function generateVoiceXML(content: string) {
 }
 
 export function playOrSay(fileName: string, fallbackText: string): string {
-    // 1. Force Male TTS for pure numbers (e.g. 1.wav)
-    if (fileName.match(/^\d+\.wav$/)) {
+    // 1. Force Male TTS for pure numbers (e.g. 1.mp3)
+    if (fileName.match(/^\d+\.mp3$/)) {
         return `<Say voice="man">${fallbackText}</Say>`;
     }
 
@@ -28,4 +28,5 @@ export function playOrSay(fileName: string, fallbackText: string): string {
 
     return `<Say voice="man">Audio missing</Say>`;
 }
+
 

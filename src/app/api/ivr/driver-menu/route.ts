@@ -36,8 +36,8 @@ export async function POST(req: Request) {
         if (!ride || ride.status === 'cancelled') {
             return generateVoiceXML(`
            <Gather action="/api/ivr/driver-menu/process?rideId=none&amp;riderId=${riderId}" method="POST" numDigits="1" timeout="7">
-               ${playOrSay('not-driving.wav', 'איר זענט נישט מיועד צו דרייוון היינט.')}
-               ${playOrSay('vacation-prompt-intro.wav', 'צו רעפארטן אז איר פארט אוועק אויף וואקאציע, דרוקט דריי.')}
+               ${playOrSay('not-driving.mp3', 'איר זענט נישט מיועד צו דרייוון היינט.')}
+               ${playOrSay('vacation-prompt-intro.mp3', 'צו רעפארטן אז איר פארט אוועק אויף וואקאציע, דרוקט דריי.')}
            </Gather>
            <Hangup/>
         `);
@@ -54,12 +54,12 @@ export async function POST(req: Request) {
 
         // 4. Generate the Menu
         let xml = `
-      ${playOrSay('you-have.wav', 'איר האט יעצט')}
-      ${playOrSay(`${activeBookings}.wav`, String(activeBookings))}
-      ${playOrSay('passengers.wav', 'פאסאזשירן פאר היינט')}
+      ${playOrSay('you-have.mp3', 'איר האט יעצט')}
+      ${playOrSay(`${activeBookings}.mp3`, String(activeBookings))}
+      ${playOrSay('passengers.mp3', 'פאסאזשירן פאר היינט')}
       
       <Gather action="/api/ivr/driver-menu/process?rideId=${ride.id}&amp;riderId=${riderId}" method="POST" numDigits="1" timeout="7">
-         ${playOrSay('driver-menu.wav', 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי. צו נעמען וואקאציע פאר אפאר טעג דרוקט דריי.')}
+         ${playOrSay('driver-menu.mp3', 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי. צו נעמען וואקאציע פאר אפאר טעג דרוקט דריי.')}
       </Gather>
       <Hangup/>
     `;
@@ -70,4 +70,5 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Say>Error.</Say><Hangup/>');
     }
 }
+
 

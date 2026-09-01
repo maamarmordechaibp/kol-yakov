@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         // Plays the staff menu MP3. If they press '1', it sends it to /process
         const xml = `
       <Gather action="/api/ivr/staff-menu/process" method="POST" numDigits="1" timeout="5">
-        ${playOrSay('staff-rider-menu.wav', 'שלום עליכם. אויב איר פארט נישט היינט מיט די קאר, ביטע דרוקט איינס.')}
+        ${playOrSay('staff-rider-menu.mp3', 'שלום עליכם. אויב איר פארט נישט היינט מיט די קאר, ביטע דרוקט איינס.')}
       </Gather>
       <!-- If they didn't press anything, hangup -->
       <Say language="he">זייט מצליח. א גוטן טאג.</Say>
@@ -28,4 +28,5 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Say>Error.</Say><Hangup/>');
     }
 }
+
 

@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         if (!activeBooking) {
             // No active preset found for today
             return generateVoiceXML(`
-        ${playOrSay('no-active-preset.wav', 'איר האט נישט קיין באשטעלטע פלאץ פאר היינט. א גוטן טאג.')}
+        ${playOrSay('no-active-preset.mp3', 'איר האט נישט קיין באשטעלטע פלאץ פאר היינט. א גוטן טאג.')}
         <Hangup/>
       `);
         }
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
         // 4. Confirm cancellation
         return generateVoiceXML(`
-      ${playOrSay('staff-cancel-confirmed.wav', 'אייער זיץ איז אפגערופן געווארן פאר היינט. א גוטן טאג.')}
+      ${playOrSay('staff-cancel-confirmed.mp3', 'אייער זיץ איז אפגערופן געווארן פאר היינט. א גוטן טאג.')}
       <Hangup/>
     `);
 
@@ -65,4 +65,5 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Say>Error.</Say><Hangup/>');
     }
 }
+
 

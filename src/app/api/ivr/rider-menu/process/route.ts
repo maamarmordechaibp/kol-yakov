@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
         if (activeBookings >= carCapacity) {
             return generateVoiceXML(`
-        ${playOrSay('no-seats.wav', 'אלע קארס זענען ליידער שוין פול פאר היינט. א גוטן טאג.')}
+        ${playOrSay('no-seats.mp3', 'אלע קארס זענען ליידער שוין פול פאר היינט. א גוטן טאג.')}
         <Hangup/>
       `);
         }
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 
         // 4. Confirm booking
         return generateVoiceXML(`
-      ${playOrSay('booking-confirmed.wav', 'דער זיץ איז באשטעלט. א גוטן טאג.')}
+      ${playOrSay('booking-confirmed.mp3', 'דער זיץ איז באשטעלט. א גוטן טאג.')}
       <Hangup/>
     `);
 
@@ -78,4 +78,5 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Say>Error.</Say><Hangup/>');
     }
 }
+
 

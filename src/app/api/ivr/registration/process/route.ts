@@ -23,13 +23,13 @@ export async function POST(req: Request) {
                 // Permanently Link
                 await supabase.from('riders').update({ phone: fromNumber }).eq('id', confirmId);
                 return generateVoiceXML(`
-                   ${playOrSay('registration-success.wav', 'אייער סעלפאן נומער איז פערמענאנט באשטעטיגט געווארן.')}
+                   ${playOrSay('registration-success.mp3', 'אייער סעלפאן נומער איז פערמענאנט באשטעטיגט געווארן.')}
                    <Redirect method="POST">/api/ivr/${destinationMenu}?riderId=${confirmId}</Redirect>
                 `);
             } else if (digits === '2') {
                 // Temporary Session
                 return generateVoiceXML(`
-                   ${playOrSay('temp-session.wav', 'איר נוצט די סיסטעם נאר פאר יעצט. ווען דער קאר פארט ארויס וועט די קאל אריינקומען צו אייער היים טעלעפאן נומער.')}
+                   ${playOrSay('temp-session.mp3', 'איר נוצט די סיסטעם נאר פאר יעצט. ווען דער קאר פארט ארויס וועט די קאל אריינקומען צו אייער היים טעלעפאן נומער.')}
                    <Redirect method="POST">/api/ivr/${destinationMenu}?riderId=${confirmId}</Redirect>
                 `);
             } else {
@@ -56,14 +56,14 @@ export async function POST(req: Request) {
 
             const xml = `
               <Gather action="/api/ivr/registration/process?confirmId=${exactRider.id}&amp;role=${finalRole}" method="POST" numDigits="1" timeout="7">
-                 ${playOrSay('confirm-profile.wav', 'צו נוצן די קאלער איי די פערמענאנט דרוקט איינס. צו נוצן די נומער נאר פאר יעצט, דרוקט צוויי.')}
+                 ${playOrSay('confirm-profile.mp3', 'צו נוצן די קאלער איי די פערמענאנט דרוקט איינס. צו נוצן די נומער נאר פאר יעצט, דרוקט צוויי.')}
               </Gather>
               <Redirect method="POST">/api/ivr/registration</Redirect>
             `;
             return generateVoiceXML(xml);
         } else {
             const xml = `
-              ${playOrSay('phone-not-found.wav', 'מיר האבן נישט געטראפן די נומער אין אונזער סיסטעם.')}
+              ${playOrSay('phone-not-found.mp3', 'מיר האבן נישט געטראפן די נומער אין אונזער סיסטעם.')}
               <Redirect method="POST">/api/ivr/registration</Redirect>
             `;
             return generateVoiceXML(xml);
@@ -73,4 +73,5 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Hangup/>');
     }
 }
+
 

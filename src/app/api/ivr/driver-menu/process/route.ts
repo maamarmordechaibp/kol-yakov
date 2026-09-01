@@ -28,7 +28,7 @@ export async function POST(req: Request) {
                 // Driver departs!
                 await supabase.from('daily_rides').update({ status: 'departed' }).eq('id', rideId);
                 return generateVoiceXML(`
-                   ${playOrSay('driver-departed-success.wav', 'א גרויסן יישר כח, אלע פאסאזשירן באקומען יעצט א קאל צו אראפקומען.')}
+                   ${playOrSay('driver-departed-success.mp3', 'א גרויסן יישר כח, אלע פאסאזשירן באקומען יעצט א קאל צו אראפקומען.')}
                    <Hangup/>
                 `);
             }
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
                 // Reset associated bookings to pending
                 await supabase.from('bookings').update({ status: 'pending', daily_ride_id: null }).eq('daily_ride_id', rideId);
                 return generateVoiceXML(`
-                   ${playOrSay('driver-cancel-success.wav', 'דער קאר איז סוקסעספול אפגעזאגט געווארן. אלע פאסאזשירן וועלן אריבערגיין צום נעקסטן קאר.')}
+                   ${playOrSay('driver-cancel-success.mp3', 'דער קאר איז סוקסעספול אפגעזאגט געווארן. אלע פאסאזשירן וועלן אריבערגיין צום נעקסטן קאר.')}
                    <Hangup/>
                 `);
             }
@@ -52,4 +52,5 @@ export async function POST(req: Request) {
         return generateVoiceXML('<Hangup/>');
     }
 }
+
 
