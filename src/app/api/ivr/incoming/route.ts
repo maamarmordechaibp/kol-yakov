@@ -39,10 +39,14 @@ export async function POST(req: Request) {
         const last10 = fromNumber.replace(/\D/g, '').slice(-10);
         const { data: riderExt } = await supabase
             .from('riders')
-            .select('id, role')
+            .select('id, role, is_active')
             .ilike('phone', `%${last10}`);
 
         const rider = riderExt && riderExt.length > 0 ? riderExt[0] : null;
+
+        if (rider && rider.is_active === false) {
+            return generateVoiceXML('<Reject reason="busy"/>');
+        }
 
         if (!rider) {
             // Unknown caller - go to registration

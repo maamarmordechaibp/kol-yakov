@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
         const { data: rides } = await supabase
             .from('daily_rides')
-            .select('id, estimated_departure_time, driver_id, drivers(car_capacity, rider_id)')
+            .select('id, estimated_departure_time, driver_id, drivers(car_capacity, rider_id, audio_type, tts_name)')
             .eq('ride_date', today)
             .eq('status', 'scheduled');
 
@@ -70,9 +70,18 @@ export async function POST(req: Request) {
         availableRides.forEach((ride, index) => {
             // Announce the driver and standard number pressing
             const pressNumber = index + 1; // 1, 2, 3...
+            const driverInfo = ride.drivers as any;
+
+            let driverAudioXML = '';
+            if (driverInfo?.audio_type === 'tts') {
+                driverAudioXML = `<Say voice="man">${driverInfo.tts_name || 'Driver'}</Say>`;
+            } else {
+                driverAudioXML = playOrSay(`r-${ride.driver_id}.mp3`, 'דעם דרייווער');
+            }
+
             gatherXml += `
         ${playOrSay('to-travel-with.mp3', 'צו פארן מיט')}
-        ${playOrSay(`r-${ride.driver_id}.mp3`, 'דעם דרייווער')}
+        ${driverAudioXML}
         ${playOrSay('leaving-at.mp3', 'וואס פארט ארויס אום')}
         ${playOrSay(`time-${ride.estimated_departure_time.replace(/:/g, '')}.mp3`, 'די צייט')}
         ${playOrSay('press.mp3', 'דרוקט')}

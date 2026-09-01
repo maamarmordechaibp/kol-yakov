@@ -9,7 +9,7 @@ export default async function PromptsPage() {
     // 1. Fetch Drivers (for dynamic voice prompts)
     const { data: drivers } = await supabase
         .from('drivers')
-        .select('id, riders(name)')
+        .select('id, audio_type, riders(name)')
 
     // 2. We need unique times to know what time prompts to record
     // Assuming times are in default_departure_time, we can just grab unique ones
@@ -60,7 +60,9 @@ export default async function PromptsPage() {
 
     // Add Dynamic Driver Names
     drivers?.forEach(d => {
-        expectedPrompts.push({ filename: `r-${d.id}.mp3`, label: `Driver Name: ${(d.riders as any)?.name}`, script: `ליגט דער נאמען פון דעם דרייווער: ${(d.riders as any)?.name}` })
+        if (d.audio_type !== 'tts') {
+            expectedPrompts.push({ filename: `r-${d.id}.mp3`, label: `Driver Name: ${(d.riders as any)?.name}`, script: `ליגט דער נאמען פון דעם דרייווער: ${(d.riders as any)?.name}` })
+        }
     })
 
     // Add Dynamic Times
