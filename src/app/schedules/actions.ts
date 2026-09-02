@@ -21,7 +21,10 @@ export async function addScheduleAction(payload: any) {
 
     revalidatePath('/schedules')
     revalidatePath('/prompts')
-    return { data: inserted }
+
+    // Strip complex Supabase prototypes before sending to Client to prevent React Error #441
+    const cleanData = JSON.parse(JSON.stringify(inserted))
+    return { data: cleanData }
 }
 
 export async function removeScheduleAction(id: string) {
