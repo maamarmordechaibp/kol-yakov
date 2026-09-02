@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Trash2, Plus, Route } from 'lucide-react'
+import { addScheduleAction, removeScheduleAction } from './actions'
 
 export default function DriverWeeklyScheduler({ initialSchedules, drivers }: { initialSchedules: any[], drivers: any[] }) {
     const supabase = createClient()
@@ -18,7 +19,7 @@ export default function DriverWeeklyScheduler({ initialSchedules, drivers }: { i
     const handleDelete = async (id: string) => {
         if (!confirm('Remove this permanent driving schedule?')) return
         setSchedules(prev => prev.filter(p => p.id !== id))
-        await supabase.from('driver_weekly_schedules').delete().eq('id', id)
+        await removeScheduleAction(id)
     }
 
     const toggleDay = (dayIndex: number) => {
@@ -42,18 +43,15 @@ export default function DriverWeeklyScheduler({ initialSchedules, drivers }: { i
             days_of_week: selectedDays
         }
 
-        const { data, error } = await supabase.from('driver_weekly_schedules').insert(payload).select(`
-            *,
-            drivers ( riders(name) )
-        `).single();
-
-        if (error) {
-            alert('Error adding driving schedule.')
+        try {
+            const { data } = await addScheduleAction(payload)
+            if (data) {
+                setSchedules(prev => [...prev, data])
+                setSelectedDays([0, 1, 2, 3, 4])
+            }
+        } catch (error: any) {
+            alert('Error adding driving schedule: ' + error.message)
             console.error(error)
-        } else if (data) {
-            setSchedules(prev => [...prev, data])
-            // Keep days as is, just clear driver maybe?
-            setSelectedDays([0, 1, 2, 3, 4])
         }
     }
 
