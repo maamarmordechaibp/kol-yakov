@@ -53,7 +53,9 @@ export default async function PromptsPage() {
         { filename: 'not-driving.mp3', label: 'Driver Menu Error: Not Scheduled', script: 'איר זענט נישט מיועד צו דרייוון היינט.' },
         { filename: 'you-have.mp3', label: 'Driver Menu: "You have..."', script: 'איר האט יעצט' },
         { filename: 'passengers.mp3', label: 'Driver Menu: "...passengers today"', script: 'פאסאזשירן פאר היינט.' },
-        { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")', script: 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי. צו נעמען וואקאציע פאר אפאר טעג דרוקט דריי.' },
+        { filename: 'driver-menu.mp3', label: 'Driver Menu Intro ("Press 1 to depart")', script: 'צו לאזן וויסן אז איר פארט יעצט ארויס ביטע דרוקט איינס. צו אפזאגן דעם קאר פאר היינט דרוקט צוויי. צו נעמען וואקאציע פאר אפאר טעג דרוקט דריי. צו שפעטיגן אייער ארויספאר צייט, דרוקט פיר.' },
+        { filename: 'delay-how-many-minutes.mp3', label: 'Driver Delay Menu: How many minutes?', script: 'פאר וויפיל מינוט שפעטיגט איר? ביטע דרוקט די נומער, נאכגעפאלגט מיטן פאונד קנעפל.' },
+        { filename: 'delay-success.mp3', label: 'Driver Delay Menu: Success', script: 'איר האט סוקסעספול געשפעטיגט עיער ארויספאר צייט צו ' },
 
         { filename: 'vacation-prompt-intro.mp3', label: 'Driver Menu: Press 3 for Vacation Intro', script: 'צו רעפארטן אז איר פארט אוועק אויף וואקאציע, דרוקט דריי.' },
         { filename: 'vacation-how-many-days.mp3', label: 'Vacation Menu: How many days?', script: 'פאר וויפיל טעג דארפט איר וואקאציע? ביטע דרוקט די נומער פון טעג, נאכגעפאלגט מיטן פאונד קנעפל.' },
