@@ -62,6 +62,11 @@ export default async function PromptsPage() {
         { filename: 'vacation-success.mp3', label: 'Vacation Menu: Success!', script: 'א דאנק. די סיסטעם האט סוקסעספול פארשריבן אייער וואקאציע. א גוטן טאג.' },
         { filename: 'driver-departed-success.mp3', label: 'Driver action: Departed!', script: 'א גרויסן יישר כח, אלע פאסאזשירן באקומען יעצט א קאל צו אראפקומען.' },
         { filename: 'driver-cancel-success.mp3', label: 'Driver action: Cancelled Run!', script: 'דער קאר איז סוקסעספול אפגעזאגט געווארן. אלע פאסאזשירן וועלן אריבערגיין צום נעקסטן קאר.' },
+
+        // Outbound Auto-Dial Alerts
+        { filename: 'driver-is-outside.mp3', label: 'OUTBOUND ALERT: Driver Departs', script: 'א גוטן. מיר רופן צו לאזן וויסן אז דער קאר איז יעצט ארויסגעפארן. ביטע קומט אראפ. צו פארן מיט ' },
+        { filename: 'driver-is-delayed.mp3', label: 'OUTBOUND ALERT: Driver Delayed', script: 'א גוטן. מיר רופן צו לאזן וויסן אז די קאר וועט זיך פארשפעטיגן. דער דרייווער וועט ארויספארן אום' },
+        { filename: 'staff-reassign-alert.mp3', label: 'OUTBOUND ALERT: Staff Reassigned', script: 'א גוטן. אייער פריערדיגע דרייווער האט אפגעזאגט דעם קאר פאר היינט. אייער פלאץ איז אטאמאטיש אריבערגעפירט געווארן צו דעם דרייווער: ' },
     ]
 
     // Numbers have been removed from the checklist - they will use automated male Text-To-Speech

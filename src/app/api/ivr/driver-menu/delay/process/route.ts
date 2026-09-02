@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateVoiceXML, playOrSay } from '@/lib/ivr-helper';
+import { generateVoiceXML, playOrSay, triggerOutboundCall } from '@/lib/ivr-helper';
 import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
@@ -36,6 +36,17 @@ export async function POST(req: Request) {
         // Format it
         const newHHString = d.getHours().toString().padStart(2, '0');
         const newMMString = d.getMinutes().toString().padStart(2, '0');
+
+        // FIRE ROBOCALLS
+        const { data: passengers } = await supabase.from('bookings').select('riders(phone)').eq('daily_ride_id', rideId).eq('status', 'active');
+        if (passengers) {
+            for (const p of passengers) {
+                const targetPhone = (p.riders as any)?.phone;
+                if (targetPhone) {
+                    triggerOutboundCall(targetPhone, `/api/ivr/outbound/driver-delayed?hh=${newHHString}&mm=${newMMString}`);
+                }
+            }
+        }
 
         const xml = `
            ${playOrSay('delay-success.mp3', 'איר האט סוקסעספול געשפעטיגט עיער ארויספאר צייט צו ')}
