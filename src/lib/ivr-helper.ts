@@ -49,7 +49,7 @@ export async function triggerOutboundCall(toNumber: string, webhookUrl: string) 
 
     // Use absolute URL for the webhook
     const customSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-    const baseHost = customSiteUrl ? customSiteUrl : 'https://kol-yakov.vercel.app';
+    const baseHost = customSiteUrl ? customSiteUrl : 'https://kol-yakov-cars.vercel.app';
     const absoluteWebhook = baseHost + webhookUrl;
 
     const url = `https://${spaceUrl}/api/laml/2010-04-01/Accounts/${projectId}/Calls.json`;

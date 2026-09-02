@@ -43,12 +43,14 @@ export async function POST(req: Request) {
         // FIRE ROBOCALLS
         const { data: passengers } = await supabase.from('bookings').select('riders(phone)').eq('daily_ride_id', rideId).eq('status', 'active');
         if (passengers) {
+            const outboundCalls = [];
             for (const p of passengers) {
                 const targetPhone = (p.riders as any)?.phone;
                 if (targetPhone) {
-                    triggerOutboundCall(targetPhone, `/api/ivr/outbound/driver-delayed?mins=${delayMinutes}`);
+                    outboundCalls.push(triggerOutboundCall(targetPhone, `/api/ivr/outbound/driver-delayed?mins=${delayMinutes}`));
                 }
             }
+            await Promise.all(outboundCalls);
         }
 
         const xml = `

@@ -35,13 +35,15 @@ export async function POST(req: Request) {
                 // OUTBOUND ROBOCALL TO PASSENGERS
                 const { data: passengers } = await supabase.from('bookings').select('riders(phone)').eq('daily_ride_id', rideId).eq('status', 'active');
                 if (passengers) {
+                    const outboundCalls = [];
                     for (const p of passengers) {
                         const targetPhone = (p.riders as any)?.phone;
                         if (targetPhone) {
-                            // Fire & Forget background trigger
-                            triggerOutboundCall(targetPhone, `/api/ivr/outbound/driver-departing?driverName=${encodeURIComponent(driverNameForCall)}`);
+                            outboundCalls.push(triggerOutboundCall(targetPhone, `/api/ivr/outbound/driver-departing?driverName=${encodeURIComponent(driverNameForCall)}`));
                         }
                     }
+                    // MUST strictly await in Serverless environments before returning!
+                    await Promise.all(outboundCalls);
                 }
 
                 return generateVoiceXML(`
