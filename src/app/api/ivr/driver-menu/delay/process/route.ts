@@ -37,6 +37,21 @@ export async function POST(req: Request) {
         const newHHString = d.getHours().toString().padStart(2, '0');
         const newMMString = d.getMinutes().toString().padStart(2, '0');
 
+        // Check if an MP3 exists for this specific time
+        const { data: promptFiles } = await supabase.storage.from('prompts').list();
+        const existingPrompts = promptFiles ? promptFiles.map(f => f.name) : [];
+        const targetFileName = `time-${newHHString}${newMMString}.mp3`;
+
+        let timeAudioXML = '';
+        if (existingPrompts.includes(targetFileName)) {
+            timeAudioXML = playOrSay(targetFileName, 'די צייט');
+        } else {
+            const ampm = d.getHours() >= 12 ? 'PM' : 'AM';
+            let hr12 = d.getHours() % 12;
+            if (hr12 === 0) hr12 = 12;
+            timeAudioXML = `<Say voice="man">${hr12} ${newMMString} ${ampm}</Say>`;
+        }
+
         // FIRE ROBOCALLS
         const { data: passengers } = await supabase.from('bookings').select('riders(phone)').eq('daily_ride_id', rideId).eq('status', 'active');
         if (passengers) {
@@ -50,7 +65,7 @@ export async function POST(req: Request) {
 
         const xml = `
            ${playOrSay('delay-success.mp3', 'איר האט סוקסעספול געשפעטיגט עיער ארויספאר צייט צו ')}
-           <Say voice="man">${newHHString}:${newMMString}</Say>
+           ${timeAudioXML}
            <Hangup/>
         `;
         return generateVoiceXML(xml);
