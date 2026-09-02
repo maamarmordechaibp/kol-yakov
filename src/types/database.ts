@@ -21,7 +21,6 @@ export interface Database {
                     id: string;
                     rider_id: string;
                     car_capacity: number;
-                    default_departure_time: string;
                     home_address: string | null;
                     created_at: string;
                 };

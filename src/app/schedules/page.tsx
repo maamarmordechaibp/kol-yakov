@@ -12,7 +12,6 @@ export default async function SchedulesPage() {
         .select(`
       id,
       car_capacity,
-      default_departure_time,
       riders(name, phone)
     `);
 
