@@ -16,7 +16,8 @@ export async function addScheduleAction(payload: any) {
         .single()
 
     if (error) {
-        throw new Error(error.message)
+        console.error("SUPABASE POSTGRESQL ERROR:", error)
+        return { error: error.message }
     }
 
     revalidatePath('/schedules')

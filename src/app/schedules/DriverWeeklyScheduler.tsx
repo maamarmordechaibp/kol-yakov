@@ -44,9 +44,13 @@ export default function DriverWeeklyScheduler({ initialSchedules, drivers }: { i
         }
 
         try {
-            const { data } = await addScheduleAction(payload)
-            if (data) {
-                setSchedules(prev => [...prev, data])
+            const res = await addScheduleAction(payload)
+            if (res.error) {
+                alert('Database Error generating schedule: ' + (res.error || 'Unknown Error (did you run the SQL script?)'))
+                return
+            }
+            if (res.data) {
+                setSchedules(prev => [...prev, res.data])
                 setSelectedDays([0, 1, 2, 3, 4])
             }
         } catch (error: any) {
