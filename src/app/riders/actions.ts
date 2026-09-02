@@ -35,7 +35,9 @@ export async function addRiderAction(formData: FormData) {
 
         await supabase.from('drivers').insert({
             rider_id: newRider.id,
-            car_capacity: capacity
+            car_capacity: capacity,
+            default_departure_time: '07:30:00', // Legacy fallback in case SQL was not dropped
+            default_direction: 'up' // Legacy fallback
         })
     }
 
@@ -66,7 +68,12 @@ export async function editUserAction(
 
     // Handle Driver Table
     if (editRole === 'driver' && !wasDriver) {
-        const { error: drvErr } = await supabase.from('drivers').insert({ rider_id: id, car_capacity: editCapacity })
+        const { error: drvErr } = await supabase.from('drivers').insert({
+            rider_id: id,
+            car_capacity: editCapacity,
+            default_departure_time: '07:30:00', // Legacy fallback in case SQL was not dropped
+            default_direction: 'up' // Legacy fallback
+        })
         if (drvErr) console.error("DRIVER INSERT ERROR:", drvErr)
     } else if (editRole === 'driver' && wasDriver) {
         await supabase.from('drivers').update({ car_capacity: editCapacity }).eq('rider_id', id)
