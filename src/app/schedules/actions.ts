@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { generateRidesForToday } from '@/lib/ride-generator'
 
 export async function addScheduleAction(payload: any) {
     const supabase = await createClient()
@@ -19,6 +20,9 @@ export async function addScheduleAction(payload: any) {
         console.error("SUPABASE POSTGRESQL ERROR:", error)
         return { error: error.message }
     }
+
+    // Instantly inject the new route into today's active pool if their schedule matches today
+    await generateRidesForToday(supabase)
 
     revalidatePath('/schedules')
     revalidatePath('/prompts')
