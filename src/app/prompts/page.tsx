@@ -84,6 +84,20 @@ export default async function PromptsPage() {
         expectedPrompts.push({ filename: formattedFileName, label: `Time: ${t}`, script: `די צייט איז ${t}` })
     })
 
+    // 4. Auto-Hydrate Dashboard with Custom Uploads from Bucket
+    // If the admin manually uploaded 'min-30.mp3' or 'time-1234.mp3', it should permanently appear on the UI list!
+    initialBucketFiles.forEach(filename => {
+        if (!expectedPrompts.find(p => p.filename === filename)) {
+            if (filename.startsWith('min-') && filename.endsWith('.mp3')) {
+                const mins = filename.replace('min-', '').replace('.mp3', '')
+                expectedPrompts.push({ filename, label: `Delay Increment: ${mins} Minutes (Custom)`, script: `אויף נאך ${mins} מינוט` })
+            } else if (filename.startsWith('time-') && filename.endsWith('.mp3')) {
+                const timeSt = filename.replace('time-', '').replace('.mp3', '')
+                expectedPrompts.push({ filename, label: `Departure Time: ${timeSt} (Custom)`, script: `די צייט איז ${timeSt}` })
+            }
+        }
+    })
+
     return <PromptsManager expectedPrompts={expectedPrompts} initialBucketFiles={initialBucketFiles} />
 }
 
