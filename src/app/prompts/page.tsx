@@ -37,7 +37,13 @@ export default async function PromptsPage() {
 
         { filename: 'no-rides-today.mp3', label: 'Bochur Error: No Rides Available Today', script: 'עס זענען נישטא קיין קארס פאר היינט. א גוטן טאג.' },
         { filename: 'no-seats.mp3', label: 'Bochur Error: Cars are Full', script: 'אלע קארס זענען ליידער שוין פול פאר היינט. א גוטן טאג.' },
-        { filename: 'rider-menu-intro.mp3', label: 'Bochur Menu Intro ("Available cars...")', script: 'דאס זענען די עוועילעבל קארס פאר היינט:' },
+
+        { filename: 'direction-menu.mp3', label: 'Phase 3: Up or Down?', script: 'צו פארן צום ישיבה, דרוקט איינס. צו פארן אהיים, דרוקט צוויי.' },
+        { filename: 'seder-menu.mp3', label: 'Phase 3: Which Seder?', script: 'פאר פארטאגס סדר דרוקט 1. פאר שיעור עיון דרוקט 2. פאר שיעור פשוט דרוקט 3. פאר נאכט סדר דרוקט 4.' },
+        { filename: 'no-cars-this-seder.mp3', label: 'Phase 3: Empty Seder', script: 'עס זענען נישטא קיין קארס יעצט פאר דעם סדר.' },
+        { filename: 'seder-cars-full.mp3', label: 'Phase 3: Seder Full', script: 'אלע קארס פאר דעם סדר זענען שוין פול.' },
+
+        { filename: 'rider-menu-intro.mp3', label: 'Bochur Menu Intro ("Available cars...")', script: 'דאס זענען די עוועילעבל קארס:' },
         { filename: 'booking-confirmed.mp3', label: 'Bochur Booking Confirmed!', script: 'אייער פלאץ דערווייל איז סוקסעספול באשטעטיגט געווארן! מיר וועלן אייך רופן ווען די קאר פארט ארויס.' },
 
         { filename: 'to-travel-with.mp3', label: 'Fragment: "To travel with..."', script: 'צו פארן מיט' },
