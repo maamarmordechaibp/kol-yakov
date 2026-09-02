@@ -28,28 +28,16 @@ export async function POST(req: Request) {
         // and just update delay_minutes. The frontend/IVR can calculate real departure!
         await supabase.from('daily_rides').update({ delay_minutes: totalDelay }).eq('id', rideId);
 
-        // Calculate the new time for the user audio:
-        const [hoursStr, minutesStr] = ride.estimated_departure_time.split(':');
-        let d = new Date();
-        d.setHours(parseInt(hoursStr), parseInt(minutesStr) + totalDelay, 0, 0);
-
-        // Format it
-        const newHHString = d.getHours().toString().padStart(2, '0');
-        const newMMString = d.getMinutes().toString().padStart(2, '0');
-
-        // Check if an MP3 exists for this specific time
+        // Check if an MP3 exists for this specific amount of minutes
         const { data: promptFiles } = await supabase.storage.from('prompts').list();
         const existingPrompts = promptFiles ? promptFiles.map(f => f.name) : [];
-        const targetFileName = `time-${newHHString}${newMMString}.mp3`;
+        const targetFileName = `min-${delayMinutes}.mp3`;
 
-        let timeAudioXML = '';
+        let minutesAudioXML = '';
         if (existingPrompts.includes(targetFileName)) {
-            timeAudioXML = playOrSay(targetFileName, 'די צייט');
+            minutesAudioXML = playOrSay(targetFileName, 'מינוט');
         } else {
-            const ampm = d.getHours() >= 12 ? 'PM' : 'AM';
-            let hr12 = d.getHours() % 12;
-            if (hr12 === 0) hr12 = 12;
-            timeAudioXML = `<Say voice="man">${hr12} ${newMMString} ${ampm}</Say>`;
+            minutesAudioXML = `<Say voice="man">${delayMinutes} minutes</Say>`;
         }
 
         // FIRE ROBOCALLS
@@ -58,14 +46,14 @@ export async function POST(req: Request) {
             for (const p of passengers) {
                 const targetPhone = (p.riders as any)?.phone;
                 if (targetPhone) {
-                    triggerOutboundCall(targetPhone, `/api/ivr/outbound/driver-delayed?hh=${newHHString}&mm=${newMMString}`);
+                    triggerOutboundCall(targetPhone, `/api/ivr/outbound/driver-delayed?mins=${delayMinutes}`);
                 }
             }
         }
 
         const xml = `
-           ${playOrSay('delay-success.mp3', 'איר האט סוקסעספול געשפעטיגט עיער ארויספאר צייט צו ')}
-           ${timeAudioXML}
+           ${playOrSay('delay-success.mp3', 'איר האט סוקסעספול פארשפעטיגט אויף נאך ')}
+           ${minutesAudioXML}
            <Hangup/>
         `;
         return generateVoiceXML(xml);

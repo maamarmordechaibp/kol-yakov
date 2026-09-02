@@ -9,10 +9,15 @@ type PromptDef = { filename: string, label: string, script?: string }
 export default function PromptsManager({ expectedPrompts, initialBucketFiles }: { expectedPrompts: PromptDef[], initialBucketFiles: string[] }) {
     const supabase = createClient()
     const [bucketFiles, setBucketFiles] = useState<string[]>(initialBucketFiles)
+    const [dynamicPrompts, setDynamicPrompts] = useState<PromptDef[]>([])
     const [uploadingTarget, setUploadingTarget] = useState<string | null>(null)
     const [isBulkUploading, setIsBulkUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const bulkInputRef = useRef<HTMLInputElement>(null)
+
+    // Custom Audio Generator State
+    const [customType, setCustomType] = useState<'minutes' | 'time'>('minutes')
+    const [customValue, setCustomValue] = useState('')
 
     async function fetchBucketState() {
         const { data } = await supabase.storage.from('prompts').list()
@@ -80,6 +85,36 @@ export default function PromptsManager({ expectedPrompts, initialBucketFiles }: 
         return supabase.storage.from('prompts').getPublicUrl(filename).data.publicUrl + '?t=' + Date.now()
     }
 
+    function addCustomPrompt(e: React.FormEvent) {
+        e.preventDefault()
+        if (!customValue) return
+
+        let newPrompt: PromptDef
+
+        if (customType === 'minutes') {
+            newPrompt = {
+                filename: `min-${customValue}.mp3`,
+                label: `Delay Increment: ${customValue} Minutes`,
+                script: `אויף נאך ${customValue} מינוט`
+            }
+        } else {
+            const formattedFileName = `time-${customValue.replace(':', '')}.mp3` // e.g. time-0730.mp3
+            newPrompt = {
+                filename: formattedFileName,
+                label: `Departure Time: ${customValue}`,
+                script: `די צייט איז ${customValue}`
+            }
+        }
+
+        // Add to dynamic list if not already there
+        if (!dynamicPrompts.find(p => p.filename === newPrompt.filename) && !expectedPrompts.find(p => p.filename === newPrompt.filename)) {
+            setDynamicPrompts(prev => [newPrompt, ...prev])
+        }
+        setCustomValue('')
+    }
+
+    const allPrompts = [...dynamicPrompts, ...expectedPrompts]
+
     return (
         <div className="p-8 max-w-6xl">
             <div className="mb-8 flex justify-between items-center">
@@ -97,6 +132,36 @@ export default function PromptsManager({ expectedPrompts, initialBucketFiles }: 
                     </button>
                 </div>
             </div>
+
+            {/* Custom Manual Prompt Generator */}
+            <form onSubmit={addCustomPrompt} className="mb-8 p-6 bg-indigo-50 border border-indigo-100 rounded-xl flex flex-wrap gap-4 items-end shadow-sm">
+                <div className="flex-1 min-w-[200px]">
+                    <h3 className="font-bold text-indigo-900 text-lg mb-1">Upload Specific Time/Delay</h3>
+                    <p className="text-xs text-indigo-700">Generate a custom recording slot instantly</p>
+                </div>
+
+                <div>
+                    <label className="block text-xs font-bold text-indigo-900 mb-1 tracking-wide uppercase">File Type</label>
+                    <select value={customType} onChange={e => { setCustomType(e.target.value as any); setCustomValue(''); }} className="w-full text-sm border border-indigo-200 rounded-lg px-3 py-2 bg-white focus:border-indigo-500 outline-none">
+                        <option value="minutes">New Delay Increment (amount of minutes)</option>
+                        <option value="time">New Departure Time (exact clock hour)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-xs font-bold text-indigo-900 mb-1 tracking-wide uppercase">Value</label>
+                    {customType === 'minutes' ? (
+                        <input type="number" required min="1" placeholder="e.g. 10" value={customValue} onChange={e => setCustomValue(e.target.value)} className="w-full text-sm border border-indigo-200 rounded-lg px-3 py-2 bg-white focus:border-indigo-500 outline-none" />
+                    ) : (
+                        <input type="time" required value={customValue} onChange={e => setCustomValue(e.target.value)} className="w-full text-sm border border-indigo-200 rounded-lg px-3 py-2 bg-white focus:border-indigo-500 outline-none" />
+                    )}
+                </div>
+
+                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-md transition-colors btn-animate">
+                    Generate Slot
+                </button>
+            </form>
+
 
             {/* Hidden file input used for the specific row uploads */}
             <input
@@ -119,7 +184,7 @@ export default function PromptsManager({ expectedPrompts, initialBucketFiles }: 
                         </tr>
                     </thead>
                     <tbody className="divide-y text-slate-700">
-                        {expectedPrompts.map(prompt => {
+                        {allPrompts.map(prompt => {
                             const isUploaded = bucketFiles.includes(prompt.filename);
                             const isCurrentlyUploading = uploadingTarget === prompt.filename;
 
