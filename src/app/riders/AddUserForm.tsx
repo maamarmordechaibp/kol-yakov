@@ -30,19 +30,15 @@ export function AddUserForm() {
             </div>
 
             {role === 'driver' && (
-                <div className="p-4 bg-blue-50 rounded-lg space-y-4 border border-blue-100">
+                <div className="p-4 bg-indigo-50 rounded-lg space-y-4 border border-indigo-100">
                     <div>
-                        <label className="block text-sm font-medium text-blue-900 mb-1">Car Capacity</label>
-                        <input name="capacity" type="number" min="1" defaultValue="4" required className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-blue-900 mb-1">Default Departure Time</label>
-                        <input name="time" type="time" defaultValue="07:30" required className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                        <label className="block text-sm font-medium text-indigo-900 mb-1">Car Capacity</label>
+                        <input name="capacity" type="number" min="1" defaultValue="4" required className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                     </div>
                 </div>
             )}
 
-            <button type="submit" className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 transition">
+            <button type="submit" className="w-full bg-indigo-600 text-white rounded-xl px-4 py-3 font-bold text-sm tracking-wide hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/30 btn-animate">
                 Add User
             </button>
         </form>

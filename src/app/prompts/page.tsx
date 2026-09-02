@@ -12,12 +12,12 @@ export default async function PromptsPage() {
         .select('id, audio_type, riders(name)')
 
     // 2. We need unique times to know what time prompts to record
-    // Assuming times are in default_departure_time, we can just grab unique ones
+    // Fetch unique departure times directly from the new weekly schedules engine
     const { data: driverTimes } = await supabase
-        .from('drivers')
-        .select('default_departure_time')
+        .from('driver_weekly_schedules')
+        .select('departure_time')
 
-    const uniqueTimes = Array.from(new Set(driverTimes?.map(d => d.default_departure_time.substring(0, 5)) || []))
+    const uniqueTimes = Array.from(new Set(driverTimes?.map(d => d.departure_time.substring(0, 5)) || []))
 
     // Fetch the bucket files safely on the server side
     const { data: bucketData } = await supabase.storage.from('prompts').list()

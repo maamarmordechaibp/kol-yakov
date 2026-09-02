@@ -32,12 +32,10 @@ export async function addRiderAction(formData: FormData) {
     // 2. If they were selected as a Driver, automatically insert into drivers table!
     if (roleSelection === 'driver') {
         const capacity = parseInt(formData.get('capacity') as string) || 4
-        const time = formData.get('time') as string // '07:30'
 
         await supabase.from('drivers').insert({
             rider_id: newRider.id,
-            car_capacity: capacity,
-            default_departure_time: time + ':00' // Append seconds for SQL Time
+            car_capacity: capacity
         })
     }
 
