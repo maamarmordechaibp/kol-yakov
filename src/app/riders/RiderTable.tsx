@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState, useMemo } from 'react'
 import { Trash2, Mic, Volume2, Save, Search, Edit2, X, AlertTriangle } from 'lucide-react'
+import { editUserAction } from './actions'
 
 export default function RiderTable({ initialRiders }: { initialRiders: any[] }) {
     const supabase = createClient()
@@ -79,39 +80,13 @@ export default function RiderTable({ initialRiders }: { initialRiders: any[] }) 
     }
 
     const saveUserEdit = async (id: string) => {
-        const payloadPhone = editPhone.replace(/\D/g, '')
-        const formattedPhone = payloadPhone.length === 10 ? '+1' + payloadPhone : (payloadPhone.length === 11 && payloadPhone.startsWith('1') ? '+' + payloadPhone : editPhone)
-
-        const dbRole = editRole === 'driver' ? 'staff' : editRole
-
-        // Update rider core
-        await supabase.from('riders').update({ name: editName, phone: formattedPhone, role: dbRole }).eq('id', id)
-
-        // Handle Driver table modifications
         const currentUser = riders.find(r => r.id === id)
         const wasDriver = currentUser?.drivers?.length > 0
 
-        let newDriverObj = currentUser?.drivers || []
+        // Push the update through the Server Action to bypass RLS insertion rules for the Drivers table!
+        await editUserAction(id, editName, editPhone, editRole, editCapacity, wasDriver)
 
-        if (editRole === 'driver' && !wasDriver) {
-            const { data: nd } = await supabase.from('drivers').insert({ rider_id: id, car_capacity: editCapacity }).select('id, audio_type, car_capacity').single()
-            if (nd) newDriverObj = [nd]
-        } else if (editRole === 'driver' && wasDriver) {
-            await supabase.from('drivers').update({ car_capacity: editCapacity }).eq('rider_id', id)
-            newDriverObj[0] = { ...newDriverObj[0], car_capacity: editCapacity }
-        } else if (editRole !== 'driver' && wasDriver) {
-            await supabase.from('drivers').delete().eq('rider_id', id)
-            newDriverObj = []
-        }
-
-        setRiders(prev => prev.map(r => r.id === id ? {
-            ...r,
-            name: editName,
-            phone: formattedPhone,
-            role: dbRole,
-            drivers: newDriverObj
-        } : r))
-
+        // Note: Revalidation handles refreshing the dataset automatically so we don't need dangerous local state hacking!
         setEditingUserId(null)
     }
 

@@ -42,3 +42,39 @@ export async function addRiderAction(formData: FormData) {
     // Refresh page
     revalidatePath('/riders')
 }
+
+export async function editUserAction(
+    id: string,
+    editName: string,
+    editPhone: string,
+    editRole: string,
+    editCapacity: number,
+    wasDriver: boolean
+) {
+    const supabase = await createClient()
+
+    // Format phone
+    let formattedPhone = editPhone.replace(/\D/g, '')
+    if (formattedPhone.length === 10) formattedPhone = '+1' + formattedPhone
+    else if (formattedPhone.length === 11 && formattedPhone.startsWith('1')) formattedPhone = '+' + formattedPhone
+
+    const dbRole = editRole === 'driver' ? 'staff' : editRole
+
+    // Update rider core
+    const { error: riderErr } = await supabase.from('riders').update({ name: editName, phone: formattedPhone, role: dbRole }).eq('id', id)
+    if (riderErr) console.error("RIDER UPDATE ERROR:", riderErr)
+
+    // Handle Driver Table
+    if (editRole === 'driver' && !wasDriver) {
+        const { error: drvErr } = await supabase.from('drivers').insert({ rider_id: id, car_capacity: editCapacity })
+        if (drvErr) console.error("DRIVER INSERT ERROR:", drvErr)
+    } else if (editRole === 'driver' && wasDriver) {
+        await supabase.from('drivers').update({ car_capacity: editCapacity }).eq('rider_id', id)
+    } else if (editRole !== 'driver' && wasDriver) {
+        await supabase.from('drivers').delete().eq('rider_id', id)
+    }
+
+    revalidatePath('/riders')
+    revalidatePath('/schedules')
+    revalidatePath('/prompts')
+}
